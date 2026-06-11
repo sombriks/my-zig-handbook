@@ -176,7 +176,7 @@ An alternative, more closer to native languages would be like this:
 const std = @import("std");
 
 pub fn main(init: std.process.Init) !void {
-    //we need a context and a buffer to get a context writer
+    //we need a context and a buffer to get a writer
     const io = init.io;
     var buf: [1024]u8 = undefined;
     var writer = std.Io.File.stdout().writer(io, &buf);
@@ -188,6 +188,16 @@ pub fn main(init: std.process.Init) !void {
 
 ```
 
-So, what is happening here? I just wanted a hello world!
+_So, what is happening here? I just wanted a hello world!_
 
-Instead, The design choice of be highly explicit surfaces.
+Instead, the design choice of be highly explicit surfaces:
+
+- The standard output belongs to the IO subsystem
+- We need a writer interface, and write operations are commonly buffered
+- We need to flush the writer buffer to the stream
+
+it affected even the main function signature, demanding it to be more explicit 
+about the possible errors.
+
+However, if all what you need is a message in the console, the first
+_hello world_ is all that you need.
