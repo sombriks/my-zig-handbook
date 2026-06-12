@@ -20,6 +20,7 @@ My study notes on [Zig][Zig], the _better than C_ programming language.
 - Basic Output (Files)
 - Error Handling
 - Tests
+- Pointers
 - Generic Types
 - Project Setup
 - Libraries
@@ -199,5 +200,40 @@ Instead, the design choice of be highly explicit surfaces:
 it affected even the main function signature, demanding it to be more explicit 
 about the possible errors.
 
-However, if all what you need is a message in the console, the first
-_hello world_ is all that you need.
+A third option is this one:
+
+```zig
+// 3-hello-world.zig
+const std = @import("std");
+
+pub fn main() void {
+    std.debug.print("Hello world!\n",.{});
+}
+```
+
+In short, explicitness does not need to translate in complexity.
+
+## Basic types
+
+Types are powerful expression features in every language. Thanks to them, you 
+don't need to track yourself memory offsets. Remember, the memory is just a 
+glorified list of bits, often grouped in chunks of bytes.
+
+This is why the type names in zig are as explicit as possible.
+
+### Integers
+
+Basic integers follows: `i8`, `i16`, `i32`, `i64` and `i128`. Those types can 
+hold the entire range of positive and negative numbers possible to represent 
+using the number of bytes presented after the _i_ letter.
+
+If you need to represent only positive integers, then the types are `u8`,`u16`, 
+`u32`, `u64` and `u128`.
+
+### Floating point number
+
+You guessed: `f8`, `f16`, `f32`, `f64` and `f128`.
+
+### Boolean
+
+Just one bit, but here you write `true` or `false`.
