@@ -12,7 +12,6 @@ My study notes on [Zig][Zig], the _better than C_ programming language.
 - Installation
 - Hello World
 - Basic Types
-- Statements
 - Control Flow
 - Structs
 - Functions
@@ -131,6 +130,8 @@ is:
 sudo dnf install zig
 ```
 
+[fedora]: https://getfedora.org
+
 One extra tool that will help is the the [zls][zls], a language server to the 
 language, so ypu get autocomplete working in lightweight text editors, such as 
 [kate][kate].
@@ -237,3 +238,7 @@ You guessed: `f8`, `f16`, `f32`, `f64` and `f128`.
 ### Boolean
 
 Just one bit, but here you write `true` or `false`.
+
+## Control Flow
+
+
