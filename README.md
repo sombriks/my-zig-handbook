@@ -258,7 +258,28 @@ pub fn main() u8 {
     var x: u8 = 255;
     std.log.debug("x value: {}", .{x});
     std.log.debug("x type: {}", .{@TypeOf(x)});// reflection!
-    x +%= 1; // overflow operator
+    std.log.debug("x size: {}", .{@sizeOf(u8)}); // size in bytes
+    x +%= 1; // overflow-aware add operator
+    // a bigger variable
+    var y: i16 = 255;
+    std.log.debug("y value: {}", .{y});
+    std.log.debug("y type: {}", .{@TypeOf(y)});
+    std.log.debug("y size: {}", .{@sizeOf(i16)});
+    y += 1; // no need to worry about overflows for now
+    std.log.debug("y value: {}", .{y});
+    // now some jazz
+    var z: u3 = 0;
+    std.log.debug("z value: {}", .{z});
+    std.log.debug("z type: {}", .{@TypeOf(z)});
+    std.log.debug("z size: {}", .{@sizeOf(u3)});
+    z +%= 1;
+    std.log.debug("z value: {}", .{z});
+    z +%= 2;
+    std.log.debug("z value: {}", .{z});
+    z +%= 4;
+    std.log.debug("z value: {}", .{z});
+    z +%= 6;
+    std.log.debug("z value: {}", .{z}); // surprise!
     return x; // returns 0
 }
 ```
@@ -303,3 +324,48 @@ pub fn main() void {
     }
 }
 ```
+
+`switch` statements:
+
+```zig
+// 2-control-flow.zig
+
+const std = @import("std");
+const print = std.debug.print;
+
+pub fn main() void {
+    const number = 1221;
+    // switch as statement
+    switch(number) {
+        // specific value
+        1 => print("is that really random?\n",.{number}),
+        // possible values
+        2,3,4,5 => print("not my options.\n",.{number}),
+        // value range
+        10...30 => print("not my range.\n",.{number}),
+        // mix things, blocks are allowed too
+        0, 31...51 => {
+            print("this is a big number.\n",.{number});
+            print("it is.\n", .{});
+
+        },
+        else => print("and everything else\n", .{})
+    }
+
+    // switch as expressions
+    const status: u16 = 404;
+    const message = switch (status) {
+        200 => "Success",
+        401 => "Unauthorized",
+        404 => "Not Found",
+        else => "Unknown Status",
+    };
+    print("message: {s}\n", .{message});
+}
+```
+
+### Loops
+
+`while` statements:
+
+`for` statements:
