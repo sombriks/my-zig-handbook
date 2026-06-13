@@ -239,6 +239,67 @@ You guessed: `f8`, `f16`, `f32`, `f64` and `f128`.
 
 Just one bit, but here you write `true` or `false`.
 
+### Custom bit sizes
+
+Another interesting feature of zig's type system is custom sized types. For 
+example, let's represent a type able to hold **8** distinct values. To make it 
+sol, all you need is **3 bits**, so declare `var x: u3 = 0;` is a complete 
+valid statement.
+
+### Small tour on types
+
+Below a small sample on how those types behave:
+
+```zig
+// 1-sample-types.zig
+
+pub fn main() u8 {
+    const std = @import("std"); // valid code!
+    var x: u8 = 255;
+    std.log.debug("x value: {}", .{x});
+    std.log.debug("x type: {}", .{@TypeOf(x)});// reflection!
+    x +%= 1; // overflow operator
+    return x; // returns 0
+}
+```
+
 ## Control Flow
 
+In zig, control flow is pretty straightforward, with a few improvemente when 
+compared with C.
 
+### Conditionals
+
+`if` statements are straightforward, with some neat [unboxing][unboxing] 
+features:
+
+[unboxing]: https://zig.guide/language-basics/optionals/
+
+```zig
+// 1-control-flow.zig
+const std = @import("std");
+const print = std.debug.print;
+
+pub fn main() void {
+    // classic conditional
+    if(true) print("This happens\n",.{});
+    if(false) print("This never happens\n",.{});
+    // conditional expression (ternary operator replacement)
+    var x: u8 = if(true) 2 else 4;
+    print("x: {}\n", .{x});
+    x+=1;
+    x = if (x % 2 == 0) 4 else 7;
+    print("x: {}\n", .{x});
+    // unwrapping optional
+    // if a variable can assume null values, the type must make it explicit:
+    var yMaybe: ?u8 = null;
+    // conditionals can check for the value presence
+    if (yMaybe) |y| {
+        print("This never happens {}\n", .{y});
+    }
+    yMaybe = 10;
+    if (yMaybe) |y| {
+        print("This optional has value {}\n", .{y});
+    }
+}
+```
