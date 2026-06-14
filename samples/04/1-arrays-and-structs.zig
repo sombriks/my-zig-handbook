@@ -1,4 +1,4 @@
-// 1-arraus-and-structs.zig
+// 1-arrays-and-structs.zig
 const xpto = @import("std");
 
 pub fn main() void {

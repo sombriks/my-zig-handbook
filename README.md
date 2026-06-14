@@ -10,11 +10,11 @@ My study notes on [Zig][Zig], the _better than C_ programming language.
 
 - Introduction
 - Installation
-- 01 - Hello World
-- 02 - Basic Types
-- 03 - Control Flow
-- 04 - Arrays and Structs
-- Pointers
+- 01: Hello World
+- 02: Basic Types
+- 03: Control Flow
+- 04: Arrays and Structs
+- 05: Pointers and memory allocation
 - Functions
 - Basic Input
 - Basic Output (Files)
@@ -139,7 +139,7 @@ language, so ypu get autocomplete working in lightweight text editors, such as
 [zls]: https://github.com/zigtools/zls
 [kate]: https://apps.kde.org/pt-br/kate/
 
-## Hello World
+## 01: Hello World
 
 So, let's say hello:
 
@@ -214,7 +214,7 @@ pub fn main() void {
 
 In short, explicitness does not need to translate in complexity.
 
-## Basic types
+## 02: Basic types
 
 Types are powerful expression features in every language. Thanks to them, you 
 don't need to track yourself memory offsets. Remember, the memory is just a 
@@ -284,7 +284,7 @@ pub fn main() u8 {
 }
 ```
 
-## Control Flow
+## 03: Control Flow
 
 In zig, control flow is pretty straightforward, with a few improvemente when 
 compared with C.
@@ -435,14 +435,14 @@ pub fn main() void {
 }
 ```
 
-## Arrays and Structs
+## 04: Arrays and Structs
 
 Let's talk a little about composite data types.
 
 Arrays are homogeneous composite data.
 
 ```zig
-// 1-arraus-and-structs.zig
+// 1-arrays-and-structs.zig
 const xpto = @import("std");
 
 pub fn main() void {
@@ -479,9 +479,60 @@ pub fn main() void {
 }
 ```
 
-Structures are heterogeneous.
+Structs and tuples are heterogeneous.
 
 ```zig
 // 2-arrays-and-structs.zig
 
+const std = @import("std");
+
+// basic declaration
+const TodoItem = struct { description: []const u8, done: bool = false };
+
+pub fn main() void {
+    var item1 = TodoItem{ .description = "walk the dog" };
+    const item2 = TodoItem{ .description = "wash dishes", .done = true };
+    std.log.info("item 1 {s}, {}", .{ item1.description, item1.done });
+    std.log.info("item 2 {s}, {}", .{ item2.description, item2.done });
+    const item3 = item1; // copy value
+    item1.done = true;
+    std.log.info("item 1 {s}, {}", .{ item1.description, item1.done });
+    std.log.info("item 3 {s}, {}", .{ item3.description, item3.done });
+    std.log.info("item 3 type: {}", .{@TypeOf(item3)});
+    std.log.info("item 3 size: {}", .{@sizeOf(@TypeOf(item3))});
+    std.log.info("item 2 size: {}", .{@sizeOf(@TypeOf(item2))});
+    std.log.info("item 1 size: {}", .{@sizeOf(@TypeOf(item1))});
+    // coercion
+    const item4: TodoItem = .{ .description = "read a book" };
+    std.log.info("item 4 {s}, {}", .{ item4.description, item4.done });
+    // tuples, kinda arbitrary list values
+    const stuff = .{1, "foo", 0o55, 0b11010001, 0xAE, item4, @TypeOf(item2)};
+    std.log.info("stuff: {any}", .{ stuff });
+}
+```
+
+Structs also doubles as namespaces, although the compilation unit itself doubles
+as namespace protection.
+
+## 05: Pointers and memory allocation
+
+So far, this tour on zig features passed all operations possible on memory
+residing on stack. Now let's see how to handle dynamic memory allocations.
+
+As i mentioned before, There is no garbage collector in zig. Instead, the
+language of in its design explicit ways to properly manage dynamic memory:
+[allocators][allocators].
+
+[allocators]: https://zig.guide/standard-library/allocators/
+
+The Zig standard library provides a pattern for allocating memory, which allows
+the programmer to choose precisely how memory allocations are done within the
+standard library. No allocations happen behind your back!
+
+This is where zig really shines: several allocators are available and the
+control over memory and leak detection makes it easier to write good quality
+software.
+
+```zig
+// 
 ```
