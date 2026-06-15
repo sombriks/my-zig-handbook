@@ -30,5 +30,17 @@ pub fn main() void {
     slice[2] = 44;
     std.log.info("buffer: {any}", .{buffer});
     // optional pointer wrapper
-
+    // this does not compile
+    // var ptr2: *u8 = null;
+    var ptr2: ?*u8 = null;
+    var value: u8 = 10;
+    // this causes a runtime error
+    // std.log.info("ptr2: {}, value: {}", .{ ptr2.?.*, value });
+    ptr2 = &value;
+    std.log.info("ptr2: {}, value: {}", .{ ptr2.?.*, value });
+    // safe way to access optionals
+    if(ptr2) |p| {
+        p.* = 11;
+        std.log.info("ptr2: {}, value: {}", .{ p.*, value });
+    }
 }
