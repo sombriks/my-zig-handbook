@@ -178,16 +178,9 @@ An alternative, more closer to native languages would be like this:
 const std = @import("std");
 
 pub fn main(init: std.process.Init) !void {
-    //we need a context and a buffer to get a writer
-    const io = init.io;
-    var buf: [1024]u8 = undefined;
-    var writer = std.Io.File.stdout().writer(io, &buf);
-    // finally, the stdout, write and flush the buffer
-    const stdout = &writer.interface;
-    try stdout.print("Hello {s}!\n", .{"World"});
-    try stdout.flush();
+    try std.Io.File.stdout()
+        .writeStreamingAll(init.io,"Hello, world!\n");
 }
-
 ```
 
 _So, what is happening here? I just wanted a hello world!_
@@ -195,11 +188,17 @@ _So, what is happening here? I just wanted a hello world!_
 Instead, the design choice of be highly explicit surfaces:
 
 - The standard output belongs to the IO subsystem
-- We need a writer interface, and write operations are commonly buffered
-- We need to flush the writer buffer to the stream
+- We need an io context (`init.io`) to perform io operations
+- We stream to the output so we don't need to handle a buffer and a writer
 
 it affected even the main function signature, demanding it to be more explicit 
-about the possible errors.
+about the possible errors, adding !void as return type, and declaring the init 
+parameter so we get some goodies ready to use.
+
+We even need to call the function using [try][try], since the io operation 
+might return an error.
+
+[try]: https://zig.guide/language-basics/errors/
 
 A third option is this one:
 
@@ -610,4 +609,7 @@ pub fn main() void {
 
 ## 06: Modules and Functions
 
+In zig, modules works pretty much like [node.js][node.js] modules. All file 
+contents are private except if marked as public, with the `pub` keyword.
 
+We must use the `@import` built-in function to look for modules.
