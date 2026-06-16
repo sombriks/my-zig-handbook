@@ -16,7 +16,7 @@ My study notes on [Zig][Zig], the _better than C_ programming language.
 - 04: Arrays and Structs
 - 05: Pointers and memory allocation
 - 06: Modules and Functions
-- Basic Input
+- 07: Basic Input
 - Basic Output (Files)
 - Error Handling
 - Tests
@@ -612,4 +612,70 @@ pub fn main() void {
 In zig, modules works pretty much like [node.js][node.js] modules. All file 
 contents are private except if marked as public, with the `pub` keyword.
 
-We must use the `@import` built-in function to look for modules.
+We must use the `@import` built-in function to look for modules:
+
+```zig
+// 1-modules-and-functions.zig
+const std = @import("std");
+
+pub fn main() void {
+    // import a module
+    const Module1 = @import("my-function.zig");
+    const add = Module1.add;
+
+    std.log.info("type of add: {}", .{@TypeOf(add)});
+    std.log.info("add 2+3: {}", .{add(2,3)});
+
+    const Module2 = @import("./my-struct.zig");
+    const p1: Module2.Player = .{};
+
+    std.log.info("type of p1: {}", .{@TypeOf(p1)});
+
+    const Player = Module2.Player;
+    const p2: Player = undefined;
+
+    std.log.info("type of p2: {}", .{@TypeOf(p2)});
+
+    // this does not compile at all
+    // const hidden = Module1.hidden;
+}
+
+```
+
+## 07: Basic Input
+
+Classically, there are 3 main options to pass input to a program: environment 
+variables, arguments and pipe / stdin.
+
+### The 'Juicy Main'
+
+Zig versions older than 0.16.0 exposed arguments and environment variables via 
+global state inside the std library. Starting from 0.16, the
+_[juicy main][juicy-main]_ changes that.
+
+[juicy-main]: https://ziglang.org/download/0.16.0/release-notes.html#Juicy-Main
+
+This small example shows how to get environment variables:
+
+```zig
+// 1-basic-input.zig
+const std = @import("std");
+
+pub fn main(init: std.process.Init) void {
+    const name = init.environ_map.get("USER") orelse "stranger";
+    std.log.info("hello, {s}!",.{name} );
+}
+```
+
+This is how you get Command line arguments:
+
+```zig
+// 2-basic-input.zig
+const std = @import("std");
+
+pub fn main(init: std.process.Init) void {
+    const args = init.minimal.args.vector;
+    std.log.info("number of arguments: {}",.{args.len});
+    for(args) |arg| std.log.info("{s}",.{arg}); // noice!
+}
+```
