@@ -645,7 +645,7 @@ pub fn main() void {
 ## 07: Basic Input
 
 Classically, there are 3 main options to pass input to a program: environment 
-variables, arguments and pipe / stdin.
+variables, arguments and pipe/stdin.
 
 ### The 'Juicy Main'
 
@@ -679,3 +679,31 @@ pub fn main(init: std.process.Init) void {
     for(args) |arg| std.log.info("{s}",.{arg}); // noice!
 }
 ```
+
+Finally, _stdin_ data input can be done like this:
+
+```zig
+// 3-basic-input.zig
+
+const std = @import("std");
+
+pub fn main(init: std.process.Init) !void {
+    // the secret number to guess
+    const number = 4;
+    std.log.debug("Guess the number:",.{} );
+    // setup io subsystem
+    const io = init.io;
+    var buf: [32]u8 = [_]u8{0} ** 32;
+    const stdin = std.Io.File.stdin();
+    var reader = stdin.reader(io, &buf);
+    // call the reader
+    const guess = try reader.interface.takeDelimiter('\n') orelse "";
+    // convert the string into number
+    const result = try std.fmt.parseInt(u8, guess, 10);
+    std.log.debug("Number: {}, Result: {}",.{number, result});
+}
+
+```
+
+And Zig exposes this philosophy of explicitness again. But once set, the 
+readline api and the number format api shines its ergonomics.
