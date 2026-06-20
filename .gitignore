@@ -13,3 +13,4 @@ zig-out/
 output.txt
 numbers.bin
 todos.bin
+sample-unicode.txt
