@@ -6,6 +6,6 @@ pub fn main(init: std.process.Init) !void {
     const io = init.io;
     const cwd = std.Io.Dir.cwd();
     const file = try cwd.createFile(io, "output.txt", .{});
-    defer file.close(io);
+    defer file.close(io); // defer call after function ends
     try file.writeStreamingAll(io, "Hello from Zig land!\n");
 }
