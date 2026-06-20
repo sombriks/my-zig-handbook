@@ -17,7 +17,7 @@ My study notes on [Zig][Zig], the _better than C_ programming language.
 - 05: Pointers and memory allocation
 - 06: Modules and Functions
 - 07: Basic Input
-- Basic Output (Files)
+- 08: Basic Output (Files)
 - Error Handling
 - Tests
 - Generic Types
@@ -702,8 +702,12 @@ pub fn main(init: std.process.Init) !void {
     const result = try std.fmt.parseInt(u8, guess, 10);
     std.log.debug("Number: {}, Result: {}",.{number, result});
 }
-
 ```
 
 And Zig exposes this philosophy of explicitness again. But once set, the 
 readline api and the number format api shines its ergonomics.
+
+## 08: Basic Output
+
+As seen in the previous section, write files involves getting a reference to 
+the IO subsystem.
