@@ -438,6 +438,8 @@ pub fn main() void {
 
 Let's talk a little about composite data types.
 
+### Arrays
+
 Arrays are homogeneous composite data.
 
 ```zig
@@ -478,6 +480,8 @@ pub fn main() void {
 }
 ```
 
+### Structs
+
 Structs and tuples are heterogeneous.
 
 ```zig
@@ -501,7 +505,7 @@ pub fn main() void {
     std.log.info("item 3 size: {}", .{@sizeOf(@TypeOf(item3))});
     std.log.info("item 2 size: {}", .{@sizeOf(@TypeOf(item2))});
     std.log.info("item 1 size: {}", .{@sizeOf(@TypeOf(item1))});
-    // coercion
+    // coercion / duck typing
     const item4: TodoItem = .{ .description = "read a book" };
     std.log.info("item 4 {s}, {}", .{ item4.description, item4.done });
     // tuples, kinda arbitrary list values
@@ -510,8 +514,72 @@ pub fn main() void {
 }
 ```
 
-Structs also doubles as namespaces, although the compilation unit itself doubles
-as namespace protection.
+### Namespace and Member functions
+
+If you define a function inside a struct, it will act as a 
+[namespace][namespace] and will hekp to avoi name clashes.
+
+[namespace]: https://en.wikipedia.org/wiki/Namespace
+
+Defining functions with [special signatures][member-functions] inside a 
+namespace/struct grants them the special status of **member fuctions**:
+
+[member-functions]: https://zig.guide/language-basics/structs
+
+```zig
+// 3-arrays-and-structs.zig
+
+const std = @import("std");
+
+const N1 = struct {
+    fn foo(m: []const u8) void {
+        std.log.info("N1.foo {s}",.{m});
+    }
+};
+
+const N2 = struct {
+    fn foo(m: []const u8) void {
+        std.log.info("N2.foo {s}",.{m});
+    }
+};
+
+const Vec3 = struct {
+    x: i128 = 0,
+    y: i128 = 0,
+    z: i128 = 0,
+    // a member function which read-only access
+    fn inverse(v: Vec3) Vec3 {
+        return Vec3{.x=-v.x, .y=-v.y, .z= -v.z};
+    }
+    // a member function able to change the instance
+    fn invert(v: *Vec3) void {
+        v.*.x = -v.*.x;
+        v.*.y = -v.*.y;
+        v.*.z = -v.*.z;
+    }
+    fn print(v:  *const Vec3) void {
+        std.log.info("vector: {*}({},{},{})", .{v, v.*.x, v.*.y, v.*.z});
+    }
+};
+
+pub fn main() void {
+    // both functions has the same name
+    N1.foo("bar");
+    N2.foo("baz");
+    var v1 = Vec3{.x=1};
+    v1.print();
+    // member functions
+    var v2 = v1.inverse();
+    v2.print();
+    v1.invert();
+    v1.print();
+}
+```
+
+Note that syntax sugar does not conflicts with the explicit control philosophy 
+of the language.
+
+
 
 ## 05: Pointers and memory allocation
 

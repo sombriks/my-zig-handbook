@@ -18,7 +18,7 @@ pub fn main() void {
     std.log.info("item 3 size: {}", .{@sizeOf(@TypeOf(item3))});
     std.log.info("item 2 size: {}", .{@sizeOf(@TypeOf(item2))});
     std.log.info("item 1 size: {}", .{@sizeOf(@TypeOf(item1))});
-    // coercion
+    // coercion / duck typing
     const item4: TodoItem = .{ .description = "read a book" };
     std.log.info("item 4 {s}, {}", .{ item4.description, item4.done });
     // tuples, kinda arbitrary list values
