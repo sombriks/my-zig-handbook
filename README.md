@@ -852,10 +852,96 @@ pub fn main(init: std.process.Init) !void {
 }
 ```
 
-See, the explicit control starts paying the extra effort.
-
+See, the explicit control starts paying the extra effort. We just serialized, 
+casted and translated pieces of memory in anytthing we want with little trouble.
 
 ### Read and write structs
+
+Like arrays, we can serialize structs with a similar approach:
+
+```zig
+// 4-basic-output.zig
+
+const std = @import("std");
+
+pub const TodoItem = struct {
+    description: [256]u8,
+    done: bool,
+};
+
+pub fn main(init: std.process.Init) !void {
+    const io = init.io;
+    const cwd = std.Io.Dir.cwd();
+
+    // 1. Prepare 10 TodoItems
+    var todos: [10]TodoItem = undefined;
+    for (&todos, 0..) |*item, i| {
+        // Fill description with some text
+        var desc: [256]u8 = [_]u8{0} ** 256;
+        const text = "Todo item number ";
+        std.mem.copyForwards(u8, desc[0..text.len], text);
+        desc[text.len] = @intCast('0' + i);
+
+        item.* = .{
+            .description = desc,
+            .done = i % 2 == 0,
+        };
+    }
+
+    // 2. Create the file todos.bin
+    const file = try cwd.createFile(io, "todos.bin", .{});
+    defer file.close(io);
+
+    // 3. Serialize the array to bytes and write to file
+    const bytes = std.mem.sliceAsBytes(&todos);
+    try file.writeStreamingAll(io, bytes);
+
+    std.log.info("Successfully serialized 10 TodoItems to todos.bin", .{});
+}
+```
+
+And Deserialization goes like this:
+
+```zig
+// 5-basic-output.zig
+
+const std = @import("std");
+const sample = @import("4-basic-output.zig");
+const TodoItem = sample.TodoItem;
+
+pub fn main(init: std.process.Init) !void {
+    const io = init.io;
+    const cwd = std.Io.Dir.cwd();
+
+    // 1. Open the existing binary file for reading
+    const file = try cwd.openFile(io, "todos.bin", .{ .mode = .read_only });
+    defer file.close(io);
+
+    // 2. Prepare the destination array of 10 TodoItem elements
+    var todos: [10]TodoItem = undefined;
+
+    // 3. Cast the destination memory area into a slice of raw bytes
+    const buffer = std.mem.sliceAsBytes(&todos);
+    // wrap and cast it to the desired reading buffer geometry
+    const wrap = @as([]const []u8, &.{buffer});
+
+    // 4. Read data sequentially until the buffer is completely filled
+    const bytesRead = try file.readStreaming(io, wrap);
+
+    // 5. Verify the results by printing the items
+    std.log.info("Bytes read: {}", .{bytesRead});
+    std.log.info("Successfully loaded {d} TodoItems!", .{todos.len});
+
+    for (todos, 0..) |item, i| {
+        // Find the actual end of the description string (null-terminated)
+        const desc_len = std.mem.indexOfScalar(u8, &item.description, 0) orelse item.description.len;
+        const description = item.description[0..desc_len];
+        std.log.info("Item {d}: description='{s}', done={}", .{ i, description, item.done });
+    }
+}
+```
+
+### Unicode Text
 
 
 

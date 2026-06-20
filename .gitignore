@@ -12,3 +12,4 @@ zig-out/
 
 output.txt
 numbers.bin
+todos.bin
