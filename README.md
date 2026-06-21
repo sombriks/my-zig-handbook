@@ -1022,10 +1022,29 @@ goes on if we didn't mind to look at it, we can deal with it as if it where an
 
 [optional-value]: https://zig.guide/language-basics/optionals/
 
-An alternative and more concise idiom is the [error catching][error-catch]:
+### Catch errors
+
+An alternative and more concise idiom is the [error catching][error-catch]. Use
+it to completely ignore the error (at your own risk of course):
 
 [error-catch]: https://zig.guide/language-basics/errors
 
 ```zig
+// 2-error-handling.zig
+
+const std = @import("std");
+
+pub fn main(init: std.process.Init) void {
+    const stdin = std.Io.File.stdin();
+    defer stdin.close(init.io);
+    var buffer = [_]u8{0} ** 1024;
+    const bytesRead = stdin.readStreaming(init.io, &.{&buffer}) catch unreachable;
+    std.log.info("Returned tytpe: {any}", .{@TypeOf(bytesRead)});
+    std.log.info("Returned value: {any}", .{bytesRead});
+    std.log.info("Bytes in the buffer {s}", .{buffer});
+}
 
 ```
+
+Instead, if you want to deal with the error, add a capture block to the catch:
+
