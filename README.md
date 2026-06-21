@@ -18,7 +18,7 @@ My study notes on [Zig][Zig], the _better than C_ programming language.
 - 06: Modules and Functions
 - 07: Basic Input
 - 08: Basic Output (Files)
-- Error Handling
+- 09: Error Handling
 - Tests
 - Generic Types
 - Project Setup
@@ -57,7 +57,7 @@ So here we are, looking at another nice tool to add into the tool belt.
 ### Why Zig?
 
 In a world full of good hammers, why choose a new one? Are the old tools 
-broken, inefficient or something?
+broken, inefficient, or something?
 
 Mot really, in fact fact the hammers aren't the problem. The nails that keeps
 changing.
@@ -101,7 +101,7 @@ is highly predictable, no gc pauses to clean things up.
 
 The explicitness baked in zig also mean that there is no such thing as higher 
 abstractions like classes or function overloading. In fact, the language 
-relates more C or rust instead of java, golang or C++.
+relates more C or rust instead of java, golang, or C++.
 
 This does not mean that zig has little expressiveness. in fact, concepts like 
 [generics][generics], [null-safe][null-safe] operations, sophisticated 
@@ -853,7 +853,7 @@ pub fn main(init: std.process.Init) !void {
 ```
 
 See, the explicit control starts paying the extra effort. We just serialized, 
-casted and translated pieces of memory in anytthing we want with little trouble.
+casted, and translated pieces of memory in anytthing we want with little trouble.
 
 ### Read and write structs
 
@@ -979,5 +979,53 @@ pub fn main(init: std.process.Init) !void {
 }
 ```
 
+## 09: Error Handling
 
+Another topic where zig shines is the architectural design of error handling.
 
+In zig, errors are values, and if a function might produce an error, it must
+inform you at compile time that an error might be returned.
+
+This is what `!void` that appears sometimes in the examples mean.
+
+Since errors are values, your program **must** deal with them: catching, passing
+it forward in the call chain, deliberately ignoring it or unwrapping it.
+
+### Errors as Values
+
+For example:
+
+```zig
+// 1-error-handling.zig
+
+const std = @import("std");
+
+pub fn main(init: std.process.Init) void {
+    const stdin = std.Io.File.stdin();
+    defer stdin.close(init.io);
+    var buffer = [_]u8{0} ** 1024;
+    const errorOrBytesRead = stdin.readStreaming(init.io,&.{&buffer});
+    std.log.info("Returned tytpe: {any}", .{@TypeOf(errorOrBytesRead)});
+    std.log.info("Returned value: {any}", .{errorOrBytesRead});
+    std.log.info("Bytes in the buffer {s}", .{buffer});
+    // to properly access the returned value, if successful, inwrap it:
+    if (errorOrBytesRead) |bytesRead| {
+        const minusLineBreak = bytesRead - 1;
+        std.log.info("bytes read: {}", .{minusLineBreak});
+    } else |err| std.log.info("Something went wrong: {}", .{err});
+}
+```
+
+In this first example, the error comes wrapped, and although life would simply
+goes on if we didn't mind to look at it, we can deal with it as if it where an
+[optional value][optional-value].
+
+[optional-value]: https://zig.guide/language-basics/optionals/
+
+An alternative and more concise idiom is the [error catching][error-catch]:
+
+[error-catch]: https://zig.guide/language-basics/errors
+
+```zig
+
+```
