@@ -19,7 +19,7 @@ My study notes on [Zig][Zig], the _better than C_ programming language.
 - 07: Basic Input
 - 08: Basic Output (Files)
 - 09: Error Handling
-- Tests
+- 10: Tests
 - Generic Types
 - Project Setup
 - Threads
@@ -1094,5 +1094,65 @@ the function caller.
 
 ### How to pass errors
 
-And uou can produce errors too, and it's quite simple:
+And you can produce errors too, and it's quite simple:
+
+```zig
+// 5-error-handling.zig
+
+const std = @import("std");
+
+// let's invent some errors
+const Err = error{OhNo, OhGod};
+
+// our function might produce errors
+fn roulette(number: u128) !void {
+    if(number % 6 == 0) return Err.OhNo;
+    if(number % 11 == 0) return Err.OhGod;
+}
+
+pub fn main() void {
+    for(0..100) |i| {
+        roulette(i) catch |err| {
+            // deal with each error type
+            switch(err) {
+                Err.OhGod => std.log.warn("{} at {}", .{err, i}),
+                else => std.log.warn("{} at {}", .{err, i})
+            }
+        };
+    }
+}
+```
+
+I think that this is the kind of thing that makes Zig worth consider to use on
+your next project. Error handling is what really matters on complex projects.
+
+## 10: Tests
+
+Zig has a built-in test runner, like any serious language should offer in the
+standard library.
+
+The same way you run code with `zig run`, you test with `zig test`.
+
+Here's a simple example:
+
+```zig
+// 1-tests.zig
+
+const std = @import("std");
+const expect = std.testing.expect;
+
+fn add(a: i32, b: i32) i32 {
+    return a + b;
+}
+
+test "expect add to work" {
+    try expect(add(2, 3) == 5);
+}
+```
+
+and run with:
+
+```bash
+zig test samples/10/1-tests.zig
+```
 
