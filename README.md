@@ -1048,3 +1048,51 @@ pub fn main(init: std.process.Init) void {
 
 Instead, if you want to deal with the error, add a capture block to the catch:
 
+```zig
+// 3-error-handling.zig
+
+const std = @import("std");
+
+pub fn main(init: std.process.Init) void {
+    const stdin = std.Io.File.stdin();
+    defer stdin.close(init.io);
+    var buffer = [_]u8{0} ** 1024;
+    const bytesRead = stdin.readStreaming(init.io, &.{&buffer}) catch |err| {
+        std.log.err("this shouldn't happen: {any}", .{err});
+        return; // end the function here
+    };
+    std.log.info("Returned tytpe: {any}", .{@TypeOf(bytesRead)});
+    std.log.info("Returned value: {any}", .{bytesRead});
+    std.log.info("Bytes in the buffer {s}", .{buffer});
+}
+```
+
+### Try 
+
+The other option is, of course, make the error a problem to someone else.
+
+The `try` clause does that:
+
+```zig
+// 4-error-handling.zig
+
+const std = @import("std");
+
+pub fn main(init: std.process.Init) !void {
+    const stdin = std.Io.File.stdin();
+    defer stdin.close(init.io);
+    var buffer = [_]u8{0} ** 1024;
+    const bytesRead = try stdin.readStreaming(init.io, &.{&buffer});
+    std.log.info("Returned tytpe: {any}", .{@TypeOf(bytesRead)});
+    std.log.info("Returned value: {any}", .{bytesRead});
+    std.log.info("Bytes in the buffer {s}", .{buffer});
+}
+```
+
+Thge difference is sutile, but now the error, if it happens, will be passed to
+the function caller.
+
+### How to pass errors
+
+And uou can produce errors too, and it's quite simple:
+
