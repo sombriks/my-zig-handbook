@@ -1150,9 +1150,16 @@ test "expect add to work" {
 }
 ```
 
-and run with:
+And run with:
 
 ```bash
 zig test samples/10/1-tests.zig
 ```
+
+### Expect functions
+
+To check if the code does what it was supposed to, use [expect][expect]
+functions family:
+
+[expect]: https://ziglang.org/documentation/master/#toc-Zig-Test
 
