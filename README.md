@@ -20,7 +20,7 @@ My study notes on [Zig][Zig], the _better than C_ programming language.
 - 08: Basic Output (Files)
 - 09: Error Handling
 - 10: Tests
-- Generic Types
+- 11: Generic Types
 - Project Setup
 - Threads
 - Networking
@@ -1163,3 +1163,31 @@ functions family:
 
 [expect]: https://ziglang.org/documentation/master/#toc-Zig-Test
 
+```zig
+// 2-tests.zig
+
+const std = @import("std");
+
+test "It should be true" {
+    try std.testing.expect(2 == 5 - 3);
+}
+
+test "It should be equal" {
+    try std.testing.expectEqual(@TypeOf(123),@TypeOf(321));
+}
+
+test "It should be same text" {
+    try std.testing.expectEqualStrings("hello", "hello");
+}
+```
+
+## 11: Generic Types
+
+The way that Zig solves type-safety issues with container types and other type 
+related scenarios is using a clever combination of types as values and 
+compile-time functions.
+
+The [comptime][comptime] keyword makes code blocks to be known at compile time. 
+That way, The type information will be enforced naturally.
+
+[comptime]: https://zig.guide/language-basics/comptime/
