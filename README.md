@@ -22,7 +22,7 @@ My study notes on [Zig][Zig], the _better than C_ programming language.
 - 10: Tests
 - 11: Generic Types
 - 12: Project Setup
-- Threads
+- 13: Threads
 - Networking
 -
 
@@ -1257,9 +1257,92 @@ Zig libraries are, like golang libraries, git repositories.
 To install one, just do the following:
 
 ```bash
-zig fetch --save git+https://github.com/sombriks/iz-even.git
+zig fetch --save git+https://github.com/sombriks/iz-even.git#0.1.1
 ```
 
-That way you can use the library on your code:
+Fetch command modifies the manifest file, adding the dependency:
 
+```zig
+.{
+    // my-project/build.zig.zon
+    .name = .my_project,
+    .version = "0.0.0",
+    .fingerprint = 0xa54a7cc241381398,
+    .minimum_zig_version = "0.16.0",
+    .dependencies = .{
+        .iz_even = .{
+            .url = "git+https://github.com/sombriks/iz-even.git?ref=0.1.1#hash",
+            .hash = "iz_even-0.1.0-<athother hash>",
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src"
+    },
+}
+```
+
+Once installed, its time to declare the dependency into your `build.zig`:
+
+```zig
+// my-project/build.zig
+const std = @import("std");
+
+pub fn build(b: *std.Build) void {
+    const target = b.standardTargetOptions(.{});
+    const optimize = b.standardOptimizeOption(.{});
+
+    // configuring fetched package
+    const iz_even_dep = b.dependency("iz_even", .{
+        .optimize = optimize,
+        .target = target
+    });
+
+    // default project module
+    const mod = b.addModule("my_project", .{
+        .root_source_file = b.path("src/root.zig"),
+        .optimize = optimize,
+        .target = target
+    });
+    mod.addImport("iz_even", iz_even_dep.module("iz_even"));
+    
+    // ...
+}
+```
+
+On the dependency is delcared, you can do this in your `root.zig`:
+
+```zig
+// my-project/src/root.zig
+//! By convention, root.zig is the root source file when making a package.
+const std = @import("std");
+const _izEven = @import("iz_even");
+
+pub const izEven = _izEven.izEven;
+
+pub fn add(a: i8, b: i8) i8 {
+    return a + b;
+}
+```
+
+And consume it in the entry point or in any place in the project you like:
+
+```zig
+// my-project/src/main.zig
+
+const std = @import("std");
+const my_project = @import("my_project");
+
+pub fn main() void {
+    const a: i8 = 3;
+    const b: i8 = 3;
+    const result: i8 = my_project.add(a, b);
+    std.log.info("is even {}",.{my_project.izEven(result)});
+}
+```
+
+Then you `zig Build run` the project and life goes on.
+
+## 13: Threads
 
