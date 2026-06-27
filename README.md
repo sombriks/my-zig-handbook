@@ -24,7 +24,6 @@ My study notes on [Zig][Zig], the _better than C_ programming language.
 - 12: Project Setup
 - Threads
 - Networking
-- Libraries
 -
 
 ## Introduction
@@ -1256,5 +1255,11 @@ zig build run
 Zig libraries are, like golang libraries, git repositories.
 
 To install one, just do the following:
+
+```bash
+zig fetch --save git+https://github.com/sombriks/iz-even.git
+```
+
+That way you can use the library on your code:
 
 
