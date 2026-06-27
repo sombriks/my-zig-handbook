@@ -5,7 +5,7 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
 
     // configuring fetched package
-    const iz_even_mod = b.addModule("iz_even", .{
+    const iz_even_dep = b.dependency("iz_even", .{
         .optimize = optimize,
         .target = target
     });
@@ -14,11 +14,9 @@ pub fn build(b: *std.Build) void {
     const mod = b.addModule("my_project", .{
         .root_source_file = b.path("src/root.zig"),
         .optimize = optimize,
-        .target = target,
-        .imports = &.{
-            .{ .name = "iz_even", .module = iz_even_mod },
-        },
+        .target = target
     });
+    mod.addImport("iz_even", iz_even_dep.module("iz_even"));
 
     // simple project executable
     const exe = b.addExecutable(.{

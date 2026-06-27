@@ -4,6 +4,6 @@ const _izEven = @import("iz_even");
 
 pub const izEven = _izEven.izEven;
 
-pub fn add(a: i32, b: i32) i32 {
+pub fn add(a: i8, b: i8) i8 {
     return a + b;
 }
