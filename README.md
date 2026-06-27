@@ -21,7 +21,7 @@ My study notes on [Zig][Zig], the _better than C_ programming language.
 - 09: Error Handling
 - 10: Tests
 - 11: Generic Types
-- Project Setup
+- 12: Project Setup
 - Threads
 - Networking
 - Libraries
@@ -1188,6 +1188,73 @@ related scenarios is using a clever combination of types as values and
 compile-time functions.
 
 The [comptime][comptime] keyword makes code blocks to be known at compile time. 
-That way, The type information will be enforced naturally.
+That combined with type as first-class citizens in zig, The type information 
+passed is guaranteed naturally.
 
 [comptime]: https://zig.guide/language-basics/comptime/
+
+```zig
+// 1-generic-types.zig
+
+const std = @import("std");
+
+fn add(T: type, a: T, b: T) T {
+    return a + b;
+}
+
+pub fn main() void {
+    const x = 10;
+    const y = 20;
+    const z = comptime add(u8, x, y);
+    std.log.info("z: {}", .{z});
+}
+```
+
+Types, like functions and errors, are first class citizens, so they can be 
+assigned as regular variables.
+
+## 12: Project Setup
+
+Like any reliable tool, Zig can scale up or down, depending on what you need.
+
+In order to organize big projects, consuming 3rd party libraries, setup a zig 
+project with `zig init`:
+
+```bash
+mkdir -p samples/12/my-project
+cd samples/12/my-project/
+zig init
+```
+
+This creates the following project structure:
+
+```bash
+my-project/
+├── build.zig
+├── build.zig.zon
+└── src/
+    ├── main.zig
+    └── root.zig
+```
+
+The `root.zig` file is the **library/package entry point**.
+
+### Build, Test, Run
+
+Zig projects are configured via `build.zig` file.
+
+This is how you build, test and run the project:
+
+```bash
+zig build
+zig build test
+zig build run
+```
+
+### Installing a Library
+
+Zig libraries are, like golang libraries, git repositories.
+
+To install one, just do the following:
+
+
