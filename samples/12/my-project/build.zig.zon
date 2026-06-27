@@ -33,8 +33,8 @@
     // internet connectivity.
     .dependencies = .{
         .iz_even = .{
-            .url = "git+https://github.com/sombriks/iz-even.git#8091dc47aea74624c0981d0a96226295ca9554a9",
-            .hash = "iz_even-0.0.0-SsyCCuYNAACPGbZCZiGxvvtFYVLkMAqmyH_DCN8mWhkX",
+            .url = "git+https://github.com/sombriks/iz-even.git?ref=0.1.1#a048e6fde4cbcaf76f6ce453f83ae2680a757566",
+            .hash = "iz_even-0.1.0-SsyCCncRAAA1OBQcAvkmEXlUgEqvf8EHoTOEAbfQs04n",
         },
     },
     .paths = .{
