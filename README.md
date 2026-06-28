@@ -23,8 +23,9 @@ My study notes on [Zig][Zig], the _better than C_ programming language.
 - 11: Generic Types
 - 12: Project Setup
 - 13: Threads
-- Networking
--
+- 14: Networking
+- 15: Databases
+- 
 
 ## Introduction
 
@@ -1434,5 +1435,20 @@ gathering, it **avoids**
 For example:
 
 ```zig
-
+// fix the snippet first
 ```
+
+As you can see, the concurrency model is abstracted from the actual 
+implementation, decoupling it from design to runtime.
+
+## 14: Networking
+
+From networking primitives to high-level protocols, You will be well served on 
+zig.
+
+### Sockets primitives
+
+### HTTP
+
+### Miscellaneous
+
