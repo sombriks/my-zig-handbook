@@ -1425,14 +1425,14 @@ Well, it abrstracts the underlying concurrency implementation, making the code
 portable event to platforms without this capability.
 
 Also, the [future api][future-api] only decouples execution from result 
-gathering, it doesn't introduce
-[color-functions](https://langdev.stackexchange.com/questions/3430/colored-vs-
-uncolored -functions) to your codebase.
+gathering, it **avoids**
+[color functions][color-functions] introduction in your codebase.
 
 [future-api]: https://ziglang.org/documentation/0.16.0/std/#std.Io.Future
-[color-functions]:
-https://langdev.stackexchange.com/questions/3430/colored-vs-uncolored-functions
+[color-functions]: https://langdev.stackexchange.com/questions/3430
 
 For example:
 
+```zig
 
+```
