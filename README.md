@@ -1494,7 +1494,7 @@ zig.
 
 ### Sockets primitives
 
-You can make use of such primitives through the `std.net` module:
+You can make use of such primitives through the `std.Io.net` module:
 
 ```zig
 // 1-networking.zig
