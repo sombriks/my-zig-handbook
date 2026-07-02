@@ -1490,11 +1490,12 @@ implementation, decoupling it from design to runtime.
 ## 14: Networking
 
 From networking primitives to high-level protocols, You will be well served on 
-zig.
+zig 0.16.0.
 
-### Sockets primitives
+### High Level Networking
 
-You can make use of such primitives through the `std.Io.net` module:
+You can make use of portable, high-level abstractions through the `std.Io.net` 
+module:
 
 ```zig
 // 1-networking.zig
@@ -1544,19 +1545,75 @@ pub fn main(init: Init) !void {
 }
 ```
 
-This module, however, remains experimental, suffering breaking changes between 
-zig minor releases.
+### Low-Level Primitives (Sockets)
 
-Therefore, another portable way to access sockets primitives in zig is through 
-the `std.posix` module:
+If you want more control over the connection, expose the socket:
 
 ```zig
 // 2-networking.zig
+//
+const std = @import("std");
 
+const Io = std.Io;
+const net = std.Io.net;
+const IpAddress = net.IpAddress;
+
+fn udpServer(io: Io, addr: IpAddress) !void {
+    var socket = try addr.bind(io, .{
+        .mode = .dgram,
+        .protocol = .udp,
+    });
+    defer socket.close(io);
+
+    std.log.info("Server UDP listening at {any}", .{addr});
+
+    var buffer: [1024]u8 = undefined;
+    while (true) {
+        const msg = try socket.receive(io, &buffer);
+        std.log.info("Received: '{s}' from {any}", .{ msg.data, msg.from });
+
+        // just echo back
+        try socket.send(io, &msg.from, msg.data);
+
+        if (std.mem.eql(u8, msg.data, "end")) break;
+    }
+}
+
+fn udpClient(io: Io, server_addr: IpAddress) !void {
+    const any_addr = try IpAddress.parse("127.0.0.1", 0);
+    var socket = try any_addr.bind(io, .{
+        .mode = .dgram,
+        .protocol = .udp,
+    });
+    defer socket.close(io);
+
+    const msg_text = "Hello from Zig 0.16!";
+    try socket.send(io, &server_addr, msg_text);
+    std.log.info("Client sent: '{s}'", .{msg_text});
+
+    var buffer: [1024]u8 = undefined;
+    const response = try socket.receive(io, &buffer);
+    std.log.info("Client received: '{s}'", .{response.data});
+
+    try socket.send(io, &server_addr, "end");
+}
+
+pub fn main(init: std.process.Init) !void {
+    const io = init.io;
+    const addr = try IpAddress.parse("127.0.0.1", 9999);
+
+    var server_task = io.async(udpServer, .{ io, addr });
+    var client_task = io.async(udpClient, .{ io, addr });
+
+    try server_task.await(io);
+    try client_task.await(io);
+}
 ```
-
 
 ### HTTP
 
-### Miscellaneous
+Going up on networking abstractions, Zig offers both a client and a server:
 
+```zig
+
+```
