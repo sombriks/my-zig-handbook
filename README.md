@@ -25,7 +25,8 @@ My study notes on [Zig][Zig], the _better than C_ programming language.
 - 13: Threads
 - 14: Networking
 - 15: Databases
-- 
+- 16: Zig As A C Compiler
+- 17: Does it worth learning Zig
 
 ## Introduction
 
@@ -1691,5 +1692,18 @@ pub fn main(init: std.process.Init) !void {
 }
 ```
 
+### Miscellaneous 
+
+The Zig ecosystem is evolving at a fast pace. For instance, those examples 
+are all based on the new sdt.Io refactoring, and more high-level 
+middleware http libraries are likely being reworked to support it.
+
 ## 15: Databases
+
+Zig supports a big variety of database engines.
+
+### SQLite
+
+### PostgreSQL
+
 
