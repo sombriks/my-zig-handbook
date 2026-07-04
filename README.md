@@ -1742,10 +1742,82 @@ pub fn main(init: std.process.Init) !void {
         std.log.info("Entry: {s} -> {any}", .{ entry.key_ptr.*, entry.value_ptr.* });
     }
 }
-
 ```
 
 ## 16: Zig As A C Compiler
+
+No Zig tutorial is complete without the mandatory _better than C_ section.
+
+You can use Zig as a C compiler:
+
+```bash
+mkdir -p samples/16/my-c-project
+cd samples/16/my-c-project
+touch foo.c bar.c main.c Makefile
+```
+
+This is the sample C code:
+
+```c
+// bar.c
+
+int bar(int a, int b) {
+    return a+b;
+}
+
+// foo.c
+
+void foo(int *a, int *b) {
+    *a = *a + 1;
+    *b = *b - 1;
+}
+
+// main.c
+#include <stdio.h>
+
+#include "foo.c"
+#include "bar.c"
+
+int main(int argc, char **argv) {
+    int a = 2;
+    int b = 2;
+    foo(&a,&b);
+    int c = bar(a,a);
+    int d = bar(b,b);
+    printf("a: %d, b: %d, c: %d, d: %d\n", a, b, c, d);
+    return 0;
+}
+```
+
+No black magic, just plain old C.
+
+And the Makefile modified to use Zig compiler:
+
+```makefile
+# all you need to replace 'native' C compiler with Zig compiler
+CC=zig cc
+
+my-c-program: main.c foo.c bar.c
+	$(CC) main.c -o my-c-program
+
+clean:
+	rm -f my-c-program
+
+all: my-c-program
+
+run: all
+	./my-c-program
+```
+
+### Using a C libray in Zig
+
+Zig can consume C libraries:
+
+```bash
+mkdir -p samples/16/my-zig-c
+cd samples/16/my-zig-c
+zig init 
+```
 
 ## 17: Databases
 
