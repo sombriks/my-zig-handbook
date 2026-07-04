@@ -1811,12 +1811,118 @@ run: all
 
 ### Using a C libray in Zig
 
-Zig can consume C libraries:
+Zig can consume C libraries directly. It's better than C consuming C, as the 
+advertisement says:
 
 ```bash
 mkdir -p samples/16/my-zig-c
 cd samples/16/my-zig-c
 zig init 
+touch src/my-c-thing.{c,h}
+```
+
+For the C part, it goes like this:
+
+```c
+// my-c-thing.h
+
+int my_function(int,int);
+
+// my-c-thing.c
+
+#include <stdio.h>
+
+#include "my-c-thing.h"
+
+int my_function(int a, int b) {
+    printf("numbers are: %d, %d\n", a, b);
+    return a + b;
+}
+```
+
+To enable C build in your zig project, modify the `build.zig`:
+
+```zig
+// build.zig
+const std = @import("std");
+
+pub fn build(b: *std.Build) void {
+    const target = b.standardTargetOptions(.{});
+    const optimize = b.standardOptimizeOption(.{});
+
+    const mod = b.addModule("my_zig_c", .{
+        .root_source_file = b.path("src/root.zig"),
+        .target = target,
+        // 1. Tell Zig to link libc
+        .link_libc = true,
+    });
+
+    // 2. Add the directory containing your C header files
+    mod.addIncludePath(b.path("src"));
+
+    // 3. Add the actual C source files to compile
+    mod.addCSourceFiles(.{
+        .files = &.{ "src/my-c-thing.c" },
+        .flags = &.{ "-Wall", "-Wextra" },
+    });
+    
+    const exe = b.addExecutable(.{
+        .name = "my_zig_c",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/main.zig"),
+            .target = target,
+            .optimize = optimize,
+            .imports = &.{
+                .{ .name = "my_zig_c", .module = mod },
+            },
+        }),
+    });
+
+    b.installArtifact(exe);
+    const run_step = b.step("run", "Run the app");
+    const run_cmd = b.addRunArtifact(exe);
+    run_step.dependOn(&run_cmd.step);
+    run_cmd.step.dependOn(b.getInstallStep());
+    if (b.args) |args| {
+        run_cmd.addArgs(args);
+    }
+    const mod_tests = b.addTest(.{
+        .root_module = mod,
+    });
+    const run_mod_tests = b.addRunArtifact(mod_tests);
+    const exe_tests = b.addTest(.{
+        .root_module = exe.root_module,
+    });
+    const run_exe_tests = b.addRunArtifact(exe_tests);
+    const test_step = b.step("test", "Run tests");
+    test_step.dependOn(&run_mod_tests.step);
+    test_step.dependOn(&run_exe_tests.step);
+}
+```
+
+Next, expose the C library to the Zig side:
+
+```zig
+// src/root.zig
+
+pub const c = @cImport({
+    @cInclude("my-c-thing.h");
+});
+```
+
+Finally, use it:
+
+```zig
+// src/main.zig
+
+const std = @import("std");
+const my_zig_c = @import("my_zig_c");
+
+pub fn main(_: std.process.Init) void {
+    std.log.info("All your {s} are belong to us.", .{"codebase"});
+    const result = my_zig_c.c.my_function(20, 22);
+    std.log.info("The result of my_function(20, 22) is {d}", .{result});
+}
 ```
 
 ## 17: Databases

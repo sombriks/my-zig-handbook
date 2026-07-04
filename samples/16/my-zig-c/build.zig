@@ -1,12 +1,26 @@
+// build.zig
 const std = @import("std");
 
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
+
     const mod = b.addModule("my_zig_c", .{
         .root_source_file = b.path("src/root.zig"),
         .target = target,
+        // 1. Tell Zig to link libc
+        .link_libc = true,
     });
+
+    // 2. Add the directory containing your C header files
+    mod.addIncludePath(b.path("src"));
+
+    // 3. Add the actual C source files to compile
+    mod.addCSourceFiles(.{
+        .files = &.{ "src/my-c-thing.c" },
+        .flags = &.{ "-Wall", "-Wextra" },
+    });
+
     const exe = b.addExecutable(.{
         .name = "my_zig_c",
         .root_module = b.createModule(.{
@@ -18,6 +32,7 @@ pub fn build(b: *std.Build) void {
             },
         }),
     });
+
     b.installArtifact(exe);
     const run_step = b.step("run", "Run the app");
     const run_cmd = b.addRunArtifact(exe);
