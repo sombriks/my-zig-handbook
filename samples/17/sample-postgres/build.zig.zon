@@ -1,0 +1,17 @@
+.{
+    .name = .sample_postgres,
+    .version = "0.0.0",
+    .fingerprint = 0xc16fbc9d06d616b, // Changing this has security and trust implications.
+    .minimum_zig_version = "0.16.0",
+    .dependencies = .{
+        .pg = .{
+            .url = "git+https://github.com/karlseguin/pg.zig?ref=master#a4e126413decee1ba141db7dfd37c84b6cc385af",
+            .hash = "pg-0.0.0-Wp_7gW2hBgAOtBRRbTZtrQYx39itKpPR1A2rxiDCjT3A",
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}
