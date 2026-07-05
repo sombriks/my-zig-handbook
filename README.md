@@ -2116,7 +2116,25 @@ mkdir infra
 touch infra/database.yml
 ```
 
-The `build.zig` for this one goes like this:
+The `database.yml` is just a simple [docker-compose][docker-compose] manifest to
+provision a postgresql database:
+
+```yml
+---
+# infra/database.yml
+name: sample-pg-zig
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sample
+    ports:
+      - "5432:5432"
+```
+
+The `build.zig` for this project goes like this:
 
 ```zig
 // build.zig
@@ -2132,7 +2150,7 @@ pub fn build(b: *std.Build) void {
     const mod = b.addModule("sample_postgres", .{
         .root_source_file = b.path("src/root.zig"),
         .target = target,
-        // 2 - register the library odule as an import
+        // 2 - register the library module as an import
         .imports = &.{
             .{ .name = "pg", .module = pg_module },
         },
@@ -2144,8 +2162,10 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("src/main.zig"),
             .target = target,
             .optimize = optimize,
+            // 2 - register the library module as an import
             .imports = &.{
                 .{ .name = "sample_postgres", .module = mod },
+                .{ .name = "pg", .module = pg_module },
             },
         }),
     });
@@ -2187,6 +2207,57 @@ To consume the database:
 ```zig
 // src/main.zig
 
+const std = @import("std");
+const pg = @import("pg");
+
+pub fn main(init: std.process.Init) !void {
+    // provision a connection pool
+    const uri = try std.Uri.parse("postgresql://postgres:postgres@localhost:5432/sample");
+    const pool = try pg.Pool.initUri(init.io, init.gpa, uri, .{ .size = 5, .timeout = 10_000 });
+    defer pool.deinit();
+
+    const sql =
+        \\select 1 + 1
+    ;
+
+    // query the database
+    var result = try pool.query(sql, .{});
+    defer result.deinit();
+
+    // loop the results
+    while (try result.next()) |row| {
+        const r = try row.get(i32, 0);
+        std.log.info("query: {s}, result: {}", .{ sql, r });
+    }
+
+    // more operations
+    const sql2 =
+        \\create table if not exists players(
+        \\  id serial primary key,
+        \\  name text not null
+        \\);
+    ;
+    _ = try pool.exec(sql2, .{});
+
+    const sql3 = "insert into players (name) values ($1);";
+    _ = try pool.exec(sql3, .{"sombriks"});
+
+    const sql4 = "select * from players;";
+    var result2 = try pool.query(sql4, .{});
+    defer result2.deinit();
+
+    while (try result2.next()) |p| {
+        std.log.info("players({},{s})", .{ try p.get(i32, 0), try p.get([]u8, 1) });
+    }
+}
+```
+
+And you can run this sample this way:
+
+```bash
+cd samples/17/sample-postgres
+zig build db
+zig build run
 ```
 
 ## 18: Does it Worth Learning Zig

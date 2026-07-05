@@ -22,8 +22,10 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("src/main.zig"),
             .target = target,
             .optimize = optimize,
+            // 2 - register the library module as an import
             .imports = &.{
                 .{ .name = "sample_postgres", .module = mod },
+                .{ .name = "pg", .module = pg_module },
             },
         }),
     });
