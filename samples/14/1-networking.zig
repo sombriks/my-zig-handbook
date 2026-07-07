@@ -13,8 +13,8 @@ fn sampleServer(io: Io, addr: IpAddress) !void {
     defer srv.deinit(io);
     const stream = try srv.accept(io);
     defer stream.close(io);
-    var buffer = [_]u8{0} ** 1024;
-    var chunk = [_]u8{0} ** 1024;
+    var buffer: [1024]u8 = @splat(0);
+    var chunk: [1024]u8 = @splat(0);
     var reader_obj = stream.reader(io, &buffer);
     var reader = &reader_obj.interface;
     const read = try reader.readSliceShort(&chunk);
@@ -25,7 +25,7 @@ fn sampleClient(io: Io, addr: IpAddress) !void {
     std.log.info("prepare client", .{});
     var stream = try addr.connect(io, .{ .mode = .stream });
     defer stream.close(io);
-    var buffer = [_]u8{0} ** 1024;
+    var buffer: [1024]u8 = @splat(0);
     var writer_obj = stream.writer(io, &buffer);
     var writer = &writer_obj.interface;
     try writer.writeAll("Hello from client");

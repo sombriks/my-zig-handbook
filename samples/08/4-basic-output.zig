@@ -15,7 +15,7 @@ pub fn main(init: std.process.Init) !void {
     var todos: [10]TodoItem = undefined;
     for (&todos, 0..) |*item, i| {
         // Fill description with some text
-        var desc: [256]u8 = [_]u8{0} ** 256;
+        var desc: [256]u8 = @splat(0);
         const text = "Todo item number ";
         std.mem.copyForwards(u8, desc[0..text.len], text);
         desc[text.len] = @intCast('0' + i);

@@ -8,7 +8,7 @@ pub fn main(init: std.process.Init) !void {
     std.log.debug("Guess the number:",.{} );
     // setup io subsystem
     const io = init.io;
-    var buf: [32]u8 = [_]u8{0} ** 32;
+    var buf: [32]u8 = @splat(0);
     const stdin = std.Io.File.stdin();
     var reader = stdin.reader(io, &buf);
     // call the reader
