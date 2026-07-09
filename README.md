@@ -1,3 +1,13 @@
+---
+layout: blog-layout.pug
+tags:
+  - posts
+  - long-rant
+  - tutorial
+  - zig
+date: 2026-07-05
+draft: false
+---
 # [my-zig-handbook][repo]
 
 My study notes on [Zig][Zig], the _better than C_ programming language.
@@ -25,7 +35,7 @@ My study notes on [Zig][Zig], the _better than C_ programming language.
 - 15: List and Map
 - 16: Zig As A C Compiler
 - 17: Databases
-- 18: Does it worth learning Zig
+- 18: Is it worth learning Zig
 - Conclusion
 
 ## Introduction
@@ -202,7 +212,7 @@ Instead, the design choice of be highly explicit surfaces:
 - We stream to the output so we don't need to handle a buffer and a writer
 
 it affects the main function signature even, demanding it to be more explicit
-about the possible errors, adding !void as the return type, and declaring the 
+about the possible errors, adding !void as the return type, and declaring the
 init parameter so we get some goodies ready to use.
 
 We even need to call the function using [try][try], since the io operation
@@ -233,7 +243,7 @@ This is why the type names in zig are as explicit as possible.
 
 ### Integers
 
-The list of asic integers follows: `i8`, `i16`, `i32`, `i64` and `i128`. Those 
+The list of asic integers follows: `i8`, `i16`, `i32`, `i64` and `i128`. Those
 types can hold the entire range of positive and negative numbers possible to
 represent using the number of bytes presented after the _i_ letter.
 
@@ -1132,7 +1142,7 @@ pub fn main() void {
 }
 ```
 
-I think that this is the kind of thing that makes Zig worth using on your 
+I think that this is the kind of thing that makes Zig worth using on your
 next project. Error handling is what really matters in complex projects.
 
 ## 10: Tests
@@ -1401,7 +1411,7 @@ But it really shines with the new concurrent [async/await][async/await] API:
 
 [async/await]: https://www.youtube.com/watch?v=iqhS98J6PNU
 
-```zjg
+```zig
 // 2-threads.zig
 
 const std = @import("std");
@@ -2269,9 +2279,9 @@ zig build db
 zig build run
 ```
 
-## 18: Does it Worth Learning Zig
+## 18: Is it Worth Learning Zig
 
-So, does it worth the effort?
+So, is it worth the effort?
 
 The short answer is **yes**, no fear of wasting time.
 
@@ -2331,8 +2341,8 @@ cases.
 
 ### Future
 
-Zig isn't at 1.0 release yet. This matters a lot. But this also keeps 
-things quite honest, so when that stable release finally arrives, Any 
+Zig isn't at 1.0 release yet. This matters a lot. But this also keeps
+things quite honest, so when that stable release finally arrives, Any
 architect can make a solid decision, able to endure over the years.
 
 I think it's a matter of time now to see the ecosystem around zig grows
@@ -2344,8 +2354,8 @@ working with it. Zig has everything right to be a great, solid platform.
 There is a lot to go deeper on this platform, this article/handbook just
 scratches the surface of what Zig has to offer right now.
 
-I really enjoyed writing about Zig. Now i am willing to use it on my 
-projects. And if you're reading this, i hope you get the same feeling and 
+I really enjoyed writing about Zig. Now i am willing to use it on my
+projects. And if you're reading this, i hope you get the same feeling and
 confidence to do so.
 
 The complete sample code for this article can be found [here][repo].
